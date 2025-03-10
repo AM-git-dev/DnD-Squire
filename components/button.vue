@@ -17,10 +17,13 @@ const onClick = () => emit('click');
 <style scoped>
 
 button {
-  padding: 10px;
+  padding: 12px 16px;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
-  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .default {
@@ -36,5 +39,9 @@ button {
 .delete {
   background: red;
   color: white;
+}
+
+button:hover {
+  transform: scale(1.05);
 }
 </style>
