@@ -1,10 +1,8 @@
 <template>
-  <div>
-    <h1>Bienvenue sur ton Companion Mobile de JDR</h1>
-    <p>Ceci est la page d'accueil</p>
+  <header>
+    <img src="/icons/logo.png" id="logo" alt="logo de l'app" width="250" height="250">
  
- 
-  </div>
+  </header>
   <FooterComp />
 </template>
 
@@ -13,5 +11,16 @@
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+header{
+  display: flex;
+  width: 100%;
+}
+
+#logo{
+  
+} 
+
+
 
 </style>
