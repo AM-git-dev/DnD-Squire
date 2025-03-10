@@ -5,6 +5,13 @@
     @mousedown="startDrag"
     @touchstart="startDrag"
   >
+
+     <div v-if="isExpanded" class="profile-container">
+      <img v-if="selectedCharacter" :src="selectedCharacter.avatar" alt="Avatar" width='100px' />
+    </div>
+
+    <div class="spacer"></div>
+
     <div class="menu">
       <NuxtLink to="/">
         <img src="/icons/home.png" alt="Accueil"/>
@@ -14,10 +21,19 @@
         <img src="/icons/character.png" alt="Personnages"/>
         <span v-if="isExpanded">Personnages</span>
       </NuxtLink>
+      <NuxtLink to="/stats">
+        <img src="/icons/stats.png" alt="Statistiques"/>
+        <span v-if="isExpanded">Stats</span>
+      </NuxtLink>
       <NuxtLink to="/inventory">
         <img src="/icons/inventory.png" alt="Inventaire"/>
         <span v-if="isExpanded">Inventaire</span>
       </NuxtLink>
+      <NuxtLink to="/tracker">
+        <img src="/icons/tracker.png" alt="Tracker"/>
+        <span v-if="isExpanded">Tracker</span>
+      </NuxtLink>
+     
     </div>
   </div>
 </template>
@@ -30,13 +46,11 @@ let startX = 0;
 let isDragging = false;
 
 const startDrag = (event) => {
-  // event.stopPropagation()
   startX = event.touches ? event.touches[0].clientX : event.clientX;
   isDragging = true;
-
   document.addEventListener("mousemove", drag);
   document.addEventListener("mouseup", stopDrag);
-  document.addEventListener("touchmove", drag, { passive: false }); // ✅ Désactive le scroll
+  document.addEventListener("touchmove", drag, { passive: false });
   document.addEventListener("touchend", stopDrag);
 };
 
@@ -63,6 +77,10 @@ const stopDrag = () => {
   document.removeEventListener("touchend", stopDrag);
 };
 
+const selectedCharacter = ref({
+  avatar: "/icons/default-avatar.png",
+});
+
 </script>
 
 <style scoped>
@@ -72,7 +90,7 @@ const stopDrag = () => {
   top: 0;
   height: 100vh;
   width: 60px; 
-  background: #333;
+  background: #121212;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,9 +98,22 @@ const stopDrag = () => {
   transition: width 0.3s ease;
   overflow: hidden;
   user-select: none;
+  justify-content: space-between;
   -webkit-tap-highlight-color: transparent; /* permet de ne pas avoir de surbrillance au clique sur les objet de la sidebar en mobile*/
 }
 
+.spacer {
+  flex:1;
+}
+.profile-container {
+  width: 100%;
+  height: 150px; 
+  background: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+}
 .sidebar.expanded {
   width: 200px;
 }
@@ -91,6 +122,12 @@ const stopDrag = () => {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  align-items: left;
+  margin-left: 10px;
+  width: 100%;
+  margin-bottom: 40px; 
+  padding-bottom: 40px
+  
 }
 
 .menu a {
@@ -102,6 +139,7 @@ const stopDrag = () => {
   font-size: 16px;
   padding: 10px;
   transition: all 0.3s ease;
+  
 }
 
 .menu img {
