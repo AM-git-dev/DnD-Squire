@@ -1,6 +1,15 @@
+*{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
 body {
     font-size: 16px; 
+    padding: 5px;
+    background: rgba(121, 38, 38, 0.37);
   }
+
 
   @media screen and (min-width: 1024px) {
     body {
