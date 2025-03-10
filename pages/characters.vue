@@ -24,13 +24,13 @@ import Sidebar from '@/components/Sidebar.vue';
 import Button from '@/components/Button.vue';
 
 const nuxtApp = useNuxtApp();
-const db = computed(() => nuxtApp.$firebaseDb); // ✅ Vérifie que db est bien défini
+const db = computed(() => nuxtApp.$firebaseDb); 
 
 const characters = ref([]);
-const charactersCollection = computed(() => db.value ? collection(db.value, "characters") : null); // ✅ Attendre que db soit chargé
+const charactersCollection = computed(() => db.value ? collection(db.value, "characters") : null); 
 
 const fetchCharacters = async () => {
-  if (!charactersCollection.value) return; // ✅ Empêcher une erreur si db est undefined
+  if (!charactersCollection.value) return; 
   const snapshot = await getDocs(charactersCollection.value);
   characters.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
