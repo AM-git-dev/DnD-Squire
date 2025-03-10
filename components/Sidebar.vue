@@ -33,7 +33,10 @@
         <img src="/icons/tracker.png" alt="Tracker"/>
         <span v-if="isExpanded">Tracker</span>
       </NuxtLink>
-     
+      <NuxtLink to="/notes">
+        <img src="/icons/notes.png" alt="Notes"/>
+        <span v-if="isExpanded">Tracker</span>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -125,8 +128,8 @@ const selectedCharacter = ref({
   align-items: left;
   margin-left: 10px;
   width: 100%;
-  margin-bottom: 40px; 
-  padding-bottom: 40px
+  padding-bottom: 70px;
+
   
 }
 
