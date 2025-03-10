@@ -18,21 +18,30 @@
 
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { collection, addDoc, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import Sidebar from '@/components/Sidebar.vue';
 import Button from '@/components/Button.vue';
+import { useNuxtApp } from '#app';
 
 const nuxtApp = useNuxtApp();
 const db = computed(() => nuxtApp.$firebaseDb); 
 
 const characters = ref([]);
-const charactersCollection = computed(() => db.value ? collection(db.value, "characters") : null); 
+const charactersCollection = computed(() => db.value ? collection(db.value, "characters") : null);
 
-const fetchCharacters = async () => {
-  if (!charactersCollection.value) return; 
-  const snapshot = await getDocs(charactersCollection.value);
-  characters.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+let unsubscribeListener = null;
+
+//Écoute en temps réel avec `onSnapshot()`
+const listenToCharacters = () => {
+  if (!charactersCollection.value) return;
+
+  unsubscribeListener = onSnapshot(charactersCollection.value, (snapshot) => {
+    characters.value = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  });
 };
 
 const addCharacter = async () => {
@@ -40,19 +49,26 @@ const addCharacter = async () => {
   const name = prompt("Quel est le nom du personnage ?");
   if (name) {
     const newCharacter = { name, level: 1 };
-    const docRef = await addDoc(charactersCollection.value, newCharacter);
-    characters.value.push({ id: docRef.id, ...newCharacter });
+    await addDoc(charactersCollection.value, newCharacter);
   }
 };
 
 const deleteCharacter = async (id) => {
   if (!db.value) return;
   await deleteDoc(doc(db.value, "characters", id));
-  characters.value = characters.value.filter(char => char.id !== id);
 };
 
-onMounted(fetchCharacters);
+onMounted(() => {
+  listenToCharacters();
+});
+
+onUnmounted(() => {
+  if (unsubscribeListener) {
+    unsubscribeListener(); // Arrête l'écoute pour éviter les fuites mémoire
+  }
+});
 </script>
+
 
 
 
