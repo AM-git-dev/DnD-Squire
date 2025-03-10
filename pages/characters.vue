@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Gestion des personnages</h1>
-    <Button variant="create" @click="addCharacter">Créer un personnage</Button>
+    <Button variant="create" @click="addCharacter">Créer un personnage </Button>
     <p>Voici la liste de tes personnages de jeu de rôle :</p>
     <ul>
       <li v-for="character in characters" :key="character.id">{{ character.name }} - Niveau {{ character.level }} 
