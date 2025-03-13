@@ -17,5 +17,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  nuxtApp.provide('firebaseApp', app);
   nuxtApp.provide('firebaseDb', db);
 });
