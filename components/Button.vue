@@ -17,11 +17,11 @@ const onClick = () => emit('click');
 <style scoped>
 
 button {
-  padding: 12px 16px;
+  padding: 12px 4px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   transition: background 0.3s ease, transform 0.2s ease;
 }
@@ -32,7 +32,7 @@ button {
 }
 
 .create {
-  background: blue;
+  background: green;
   color: white;
 }
 
@@ -41,7 +41,12 @@ button {
   color: white;
 }
 
+.select {
+  background: blue;
+  color: white;
+}
+
 button:hover {
   transform: scale(1.05);
-} 
+}
 </style>
