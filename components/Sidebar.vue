@@ -1,13 +1,21 @@
 <template>
-  <div 
-    class="sidebar" 
-    :class="{ expanded: isExpanded }"
-    @mousedown="startDrag"
-    @touchstart="startDrag"
+  <div
+      class="sidebar"
+      :class="{ expanded: isExpanded }"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
   >
-
-     <div v-if="isExpanded" class="profile-container">
-      <img v-if="selectedCharacter" :src="selectedCharacter.avatar" alt="Avatar" width='100px' />
+    <div
+        v-if="isExpanded"
+        class="profile-container"
+        @click="triggerFileInput"
+    >
+      <img
+          :src="characterStore.selectedCharacter?.avatar || '/icons/default-avatar.png'"
+          alt="Avatar"
+          width="100px"
+      />
+      <input type="file" ref="fileInput" @change="uploadAvatar" accept="image/*" hidden />
     </div>
 
     <div class="spacer"></div>
@@ -17,7 +25,7 @@
         <img src="/icons/home.png" alt="Accueil"/>
         <span v-if="isExpanded">Accueil</span>
       </NuxtLink>
-      <NuxtLink to="characters">
+      <NuxtLink to="/characters">
         <img src="/icons/character.png" alt="Personnages"/>
         <span v-if="isExpanded">Personnages</span>
       </NuxtLink>
@@ -33,27 +41,85 @@
         <img src="/icons/tracker.png" alt="Tracker"/>
         <span v-if="isExpanded">Tracker</span>
       </NuxtLink>
-      <NuxtLink to="/notes">
-        <img src="/icons/notes.png" alt="Notes"/>
-        <span v-if="isExpanded">Tracker</span>
+      <NuxtLink to="/fight">
+        <img src="/icons/notes.png" alt="Fight"/>
+        <span v-if="isExpanded">Combat</span>
       </NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import {ref, onMounted} from 'vue';
+import {useNuxtApp} from '#app';
+import {useCharacterStore} from '@/stores/character';
 
+const nuxtApp = useNuxtApp();
+const fileInput = ref(null);
+const characterStore = useCharacterStore();
 const isExpanded = ref(false);
 let startX = 0;
 let isDragging = false;
+
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+const uploadAvatar = async (event) => {
+  const file = event.target.files[0];
+  if (!file || !characterStore.selectedCharacter) return;
+
+  try {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(e) {
+      const base64Image = e.target.result;
+      const updatedCharacter = {
+        ...characterStore.selectedCharacter,
+        avatar: base64Image
+      };
+
+      characterStore.setCharacter(updatedCharacter);
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(`avatar_${characterStore.selectedCharacter.id}`, base64Image);
+          console.log("Avatar sauvegardé dans localStorage avec succès");
+        } catch (storageError) {
+          console.warn("Avatar trop volumineux pour localStorage, seule la session courante le conservera");
+        }
+      }
+    };
+  } catch (error) {
+    console.error("Erreur lors de l'upload de l'avatar:", error);
+    alert("Une erreur est survenue lors de l'upload de l'avatar.");
+  }
+};
+
+const loadLocalAvatars = () => {
+  if (typeof window !== 'undefined' && characterStore.selectedCharacter?.id) {
+    const savedAvatar = localStorage.getItem(`avatar_${characterStore.selectedCharacter.id}`);
+    if (savedAvatar && characterStore.selectedCharacter) {
+      if (!characterStore.selectedCharacter.avatar ||
+          characterStore.selectedCharacter.avatar.startsWith('/icons/')) {
+        const updatedCharacter = {
+          ...characterStore.selectedCharacter,
+          avatar: savedAvatar
+        };
+        characterStore.setCharacter(updatedCharacter);
+      }
+    }
+  }
+};
 
 const startDrag = (event) => {
   startX = event.touches ? event.touches[0].clientX : event.clientX;
   isDragging = true;
   document.addEventListener("mousemove", drag);
   document.addEventListener("mouseup", stopDrag);
-  document.addEventListener("touchmove", drag, { passive: false });
+  document.addEventListener("touchmove", drag, {passive: false});
   document.addEventListener("touchend", stopDrag);
 };
 
@@ -63,13 +129,11 @@ const drag = (event) => {
   const clientX = event.touches ? event.touches[0].clientX : event.clientX;
   const diff = clientX - startX;
 
-  if (diff > 50) { 
+  if (diff > 50) {
     isExpanded.value = true;
-  } else if (diff < -50) { 
+  } else if (diff < -50) {
     isExpanded.value = false;
   }
-
-  console.log("Drag détecté, isExpanded =", isExpanded.value);
 };
 
 const stopDrag = () => {
@@ -80,10 +144,9 @@ const stopDrag = () => {
   document.removeEventListener("touchend", stopDrag);
 };
 
-const selectedCharacter = ref({
-  avatar: "/icons/default-avatar.png",
+onMounted(() => {
+  loadLocalAvatars();
 });
-
 </script>
 
 <style scoped>
@@ -92,8 +155,8 @@ const selectedCharacter = ref({
   left: 0;
   top: 0;
   height: 100vh;
-  width: 60px; 
-  background: #121212;
+  width: 60px;
+  background: rgba(18, 18, 18, 0.8);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -102,21 +165,24 @@ const selectedCharacter = ref({
   overflow: hidden;
   user-select: none;
   justify-content: space-between;
-  -webkit-tap-highlight-color: transparent; /* permet de ne pas avoir de surbrillance au clique sur les objet de la sidebar en mobile*/
+  -webkit-tap-highlight-color: transparent;
 }
 
 .spacer {
-  flex:1;
+  flex: 1;
 }
+
 .profile-container {
   width: 100%;
-  height: 150px; 
+  height: 150px;
   background: #444;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50px;
+  cursor: pointer;
 }
+
 .sidebar.expanded {
   width: 200px;
 }
@@ -125,12 +191,10 @@ const selectedCharacter = ref({
   display: flex;
   flex-direction: column;
   gap: 15px;
-  align-items: left;
+  align-items: flex-start;
   margin-left: 10px;
   width: 100%;
   padding-bottom: 70px;
-
-  
 }
 
 .menu a {
@@ -142,7 +206,6 @@ const selectedCharacter = ref({
   font-size: 16px;
   padding: 10px;
   transition: all 0.3s ease;
-  
 }
 
 .menu img {
