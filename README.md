@@ -2,13 +2,13 @@
 
 ## Votre compagnon de jeu de rôle pixel art
 
-![DnD Squire Logo](./public/icons/screenreadme.jpg)
+<img src="./public/icons/screenreadme.jpg" width="344" height="730" alt="DnD Squire Screenshot">
 
 ## À propos
 
 DnD Squire est une application mobile au style pixel art conçue pour moderniser et simplifier l'expérience des joueurs de jeux de rôle sur table. Fini les fiches de personnage froissées, les calculs approximatifs et les notes éparpillées !
 
-## Fonctionnalités
+## Fonctionnalités (à venir)
 
 ### Gestion de Personnages
 - **Création de personnage** : Créez et personnalisez vos héros en quelques clics
