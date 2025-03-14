@@ -23,6 +23,7 @@ button {
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+  width: fit-content;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
