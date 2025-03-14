@@ -166,13 +166,11 @@ export default {
     },
     async saveCharacter() {
       try {
-        // Si un personnage existe déjà (édition), le mettre à jour
         if (this.character.id) {
           const characterRef = doc(db, 'characters', this.character.id);
           await updateDoc(characterRef, this.character);
           this.$router.push('/characters');
         } else {
-          // Sinon, créer un nouveau personnage
           await addDoc(collection(db, 'characters'), this.character);
           this.$router.push('/characters');
         }

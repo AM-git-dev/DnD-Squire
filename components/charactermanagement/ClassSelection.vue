@@ -23,21 +23,21 @@
     <div v-if="selectedClass" class="class-details">
       <h3>{{ selectedClass.name }}</h3>
       <div class="class-description">
-        <p>{{ selectedClass.description }}</p>
+        <p class="blacktext">{{ selectedClass.description }}</p>
       </div>
       
       <h4>Caractéristiques principales</h4>
-      <p>{{ selectedClass.primaryAbility.map(ability => statName(ability)).join(', ') }}</p>
+      <p class="blacktext">{{ selectedClass.primaryAbility.map(ability => statName(ability)).join(', ') }}</p>
       
       <h4>Points de vie</h4>
-      <p><strong>Dé de vie :</strong> {{ selectedClass.hitDie }}</p>
-      <p><strong>PV au niveau 1 :</strong> {{ selectedClass.hitDie }} + votre modificateur de Constitution</p>
+      <p class="blacktext"><strong>Dé de vie :</strong> {{ selectedClass.hitDie }}</p>
+      <p class="blacktext"><strong>PV au niveau 1 :</strong> {{ selectedClass.hitDie }} + votre modificateur de Constitution</p>
       
       <h4>Compétences & maîtrises</h4>
-      <p><strong>Armures :</strong> {{ selectedClass.proficiencies.armor.join(', ') }}</p>
-      <p><strong>Armes :</strong> {{ selectedClass.proficiencies.weapons.join(', ') }}</p>
-      <p><strong>Outils :</strong> {{ selectedClass.proficiencies.tools.join(', ') || 'Aucun' }}</p>
-      <p><strong>Jets de sauvegarde :</strong> {{ selectedClass.proficiencies.savingThrows.map(save => statName(save)).join(', ') }}</p>
+      <p class="blacktext"><strong>Armures :</strong> {{ selectedClass.proficiencies.armor.join(', ') }}</p>
+      <p class="blacktext"><strong>Armes :</strong> {{ selectedClass.proficiencies.weapons.join(', ') }}</p>
+      <p class="blacktext"><strong>Outils :</strong> {{ selectedClass.proficiencies.tools.join(', ') || 'Aucun' }}</p>
+      <p class="blacktext"><strong>Jets de sauvegarde :</strong> {{ selectedClass.proficiencies.savingThrows.map(save => statName(save)).join(', ') }}</p>
       
       <h4>Équipement de départ</h4>
       <ul>
@@ -155,6 +155,11 @@ export default {
 </script>
 
 <style scoped>
+
+.blacktext {
+    color:black
+  }
+  
 .class-selection {
   width: 100%;
 }
@@ -193,7 +198,7 @@ export default {
 .class-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .class-info {
@@ -289,6 +294,8 @@ export default {
 .btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+
+ 
 }
 
 /* Ajout de media queries pour le responsive */

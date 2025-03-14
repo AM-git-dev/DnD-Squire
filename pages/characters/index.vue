@@ -168,6 +168,15 @@ td {
   }
   p {
     color: white;
+    background-color: rgba(0, 0, 0, 0.507);
+  }
+}
+
+@media screen  and (min-width:375px) {
+  p {
+    background-color: rgba(0, 0, 0, 0.329);
+    color :white;
+    width: fit-content;
   }
 }
 </style>
