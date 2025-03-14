@@ -11,9 +11,9 @@ DnD Squire est une application mobile au style pixel art conçue pour moderniser
 ## Fonctionnalités (à venir)
 
 ### Gestion de Personnages
-- **Création de personnage** : Créez et personnalisez vos héros en quelques clics
-- **Avatars personnalisés** : Donnez vie à vos personnages avec des avatars uniques
-- **Sélection facile** : Basculez entre vos différents personnages lors de vos sessions de jeu
+- **Création de personnage** : Créez et personnalisez vos héros en quelques clics (done)
+- **Avatars personnalisés** : Donnez vie à vos personnages avec des avatars uniques 
+- **Sélection facile** : Basculez entre vos différents personnages lors de vos sessions de jeu (done)
 
 ### Statistiques et Progression
 - **Suivi de niveau** : Gérez la progression de votre personnage
@@ -42,9 +42,8 @@ DnD Squire est une application mobile au style pixel art conçue pour moderniser
 - **Personnages spécifiques** : Associez vos personnages à leurs campagnes respectives
 
 ## Avantages
-- Interface intuitive adaptée aux joueurs de tous niveaux
-- Design pixel art nostalgique et attrayant
-- Application légère fonctionnant même sans connexion internet
+- Interface intuitive adaptée aux joueurs de tous niveaux 
+- Design pixel art nostalgique et attrayant 
 - Remplace efficacement la fiche papier traditionnelle
 - Adaptée pour smartphone et tablette
 
