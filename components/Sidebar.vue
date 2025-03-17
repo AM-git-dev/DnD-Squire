@@ -5,6 +5,13 @@
       @mousedown="startDrag"
       @touchstart="startDrag"
   >
+  
+    <div class="hamburger-button" @click.stop="toggleSidebar">
+      <div class="hamburger-line"></div>
+      <div class="hamburger-line"></div>
+      <div class="hamburger-line"></div>
+    </div>
+
     <div
         v-if="isExpanded"
         class="profile-container"
@@ -50,16 +57,33 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue';
-import {useNuxtApp} from '#app';
-import {useCharacterStore} from '@/stores/character';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useNuxtApp } from '#app';
+import { useCharacterStore } from '@/stores/character';
 
 const nuxtApp = useNuxtApp();
 const fileInput = ref(null);
 const characterStore = useCharacterStore();
 const isExpanded = ref(false);
+const isTablet = ref(false);
 let startX = 0;
 let isDragging = false;
+
+const checkIfTablet = () => {
+  isTablet.value = window.innerWidth >= 768; 
+  if (isTablet.value) {
+    isExpanded.value = true;
+  } else if (!isTablet.value && isExpanded.value) {
+    if (!isDragging) {
+      isExpanded.value = false;
+    }
+  }
+};
+
+
+const toggleSidebar = () => {
+  isExpanded.value = !isExpanded.value;
+};
 
 const triggerFileInput = () => {
   if (fileInput.value) {
@@ -115,6 +139,8 @@ const loadLocalAvatars = () => {
 };
 
 const startDrag = (event) => {
+  if (isTablet.value) return;
+  
   startX = event.touches ? event.touches[0].clientX : event.clientX;
   isDragging = true;
   document.addEventListener("mousemove", drag);
@@ -144,8 +170,22 @@ const stopDrag = () => {
   document.removeEventListener("touchend", stopDrag);
 };
 
+const handleResize = () => {
+  checkIfTablet();
+};
+
 onMounted(() => {
   loadLocalAvatars();
+  if (typeof window !== 'undefined') {
+    checkIfTablet(); 
+    window.addEventListener('resize', handleResize);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', handleResize);
+  }
 });
 </script>
 
@@ -156,7 +196,7 @@ onMounted(() => {
   top: 0;
   height: 100vh;
   width: 60px;
-  background: rgba(18, 18, 18, 0.8);
+  background: #222;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,6 +206,7 @@ onMounted(() => {
   user-select: none;
   justify-content: space-between;
   -webkit-tap-highlight-color: transparent;
+  z-index: 1000;
 }
 
 .spacer {
@@ -181,6 +222,7 @@ onMounted(() => {
   justify-content: center;
   border-radius: 50px;
   cursor: pointer;
+  margin-top: 30px;
 }
 
 .sidebar.expanded {
@@ -215,5 +257,58 @@ onMounted(() => {
 
 .menu span {
   white-space: nowrap;
+}
+
+.hamburger-button {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 30px;
+  height: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.expanded .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 6px);
+}
+
+.expanded .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.expanded .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -6px);
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    width: 200px; 
+  }
+  
+  .hamburger-button {
+    display: none; 
+  }
+  
+  .profile-container {
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 200px;
+  }
 }
 </style>
