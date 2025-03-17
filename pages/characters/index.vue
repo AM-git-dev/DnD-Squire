@@ -9,6 +9,7 @@
     <div class="datacontainer">
       <table>
         <tr v-for="character in characters" :key="character.id">
+          <td><img :src= "character.race.image" alt=""></td>
           <td>{{ character.name }} <br> Niveau {{ character.level }}</td>
           <td><Button variant="select" @click="selectCharacter(character)">Sélectionner</Button></td>
           <td><Button variant="delete" @click="deleteCharacter(character.id)">Supprimer</Button></td>
@@ -17,7 +18,6 @@
     </div>
     <p v-if="characterStore.selectedCharacter">Personnage actuellement sélectionné pour la campagne:  {{ characterStore.selectedCharacter.name }}</p>
   </div>
-  <FooterComp />
 </template>
 
 <script setup>
@@ -92,7 +92,7 @@ onUnmounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 header {
   display: flex;
   flex-direction: column;
@@ -105,7 +105,7 @@ header {
   margin-bottom: 10%;
 }
 table {
-  margin-top: 20%;
+  margin: 10% 0;
   background: rgba(245, 245, 245, 0.24);
   color: white;
 }
@@ -128,8 +128,21 @@ td {
   justify-content: center;
   align-items: center;
   padding: 15px 5px;
-  width: 100px;
+  width: 120px;
+ img {
+  width: 80px;
+ }
+}
 
+a {
+  display: flex;
+  justify-content: center;
+  text-decoration: none;
+}
+
+p {
+  color:white;
+  background: none;
 }
 
 @media screen and (min-width: 1024px) {
@@ -163,18 +176,12 @@ td {
   }
 
   .create{
-    width:35%;
     margin-bottom: 100px;
-  }
-  p {
-    color: white;
-    background-color: rgba(0, 0, 0, 0.507);
   }
 }
 
 @media screen  and (min-width:375px) {
   p {
-    background-color: rgba(0, 0, 0, 0.329);
     color :white;
     width: fit-content;
   }
