@@ -12,14 +12,14 @@
           <h3>{{ character.name }}</h3>
           <div class="character-subtitle">
             <span>{{ character.race?.name || 'Race inconnue' }}</span>
-            <span>&nbsp;•&nbsp;</span>
+            <span class="separator"></span>
             <span>{{ character.class?.name || 'Classe inconnue' }}</span>
-            <span>&nbsp;•&nbsp;</span>
+            <span class="separator"></span>
             <span>Niveau {{ character.level }}</span>
           </div>
           <div class="character-background">
             <span>{{ formatBackground(character.background) }}</span>
-            <span>&nbsp;•&nbsp;</span>
+            <span class="separator"></span>
             <span>{{ formatAlignment(character.alignment) }}</span>
           </div>
         </div>
@@ -102,9 +102,9 @@
               Vous pouvez choisir {{ character.class.numSkillsProficiencies }} compétences parmi:
             </div>
             <div class="skill-options">
-              <span v-for="(skill, index) in character.class.skillProficiencies" :key="index">
-                {{ formatSkill(skill) }}{{ index < character.class.skillProficiencies.length - 1 ? ', ' : '' }}
-              </span>
+              <template v-for="(skill, index) in character.class.skillProficiencies" :key="index">
+                {{ formatSkill(skill) }}<span v-if="index < character.class.skillProficiencies.length - 1" class="comma">, </span>
+              </template>
             </div>
           </div>
           <div v-else class="no-data">Aucune compétence disponible</div>
@@ -264,20 +264,16 @@ export default {
 .character-portrait {
   width: 100px;
   height: 100px;
-  min-width: 80px; 
-  min-height: 80px;
   border-radius: 50%;
   overflow: hidden;
   background-color: #ddd;
   margin-right: 1.5rem;
-  flex-shrink: 0; 
 }
 
 .character-portrait img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center; 
 }
 
 .character-identity {
@@ -293,11 +289,31 @@ export default {
 .character-subtitle {
   color: #666;
   margin-bottom: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .character-background {
   color: #888;
   font-style: italic;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.separator {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #999;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+
+.comma {
+  margin-right: 0.25rem;
 }
 
 .summary-content {
@@ -306,7 +322,6 @@ export default {
 
 .summary-section {
   margin-bottom: 2rem;
-  margin-left: 1rem;
 }
 
 .summary-section h4 {
@@ -321,6 +336,33 @@ export default {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .summary-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .character-portrait {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .character-subtitle, .character-background {
+    justify-content: center;
+  }
 }
 
 .stat-box {
@@ -351,6 +393,12 @@ export default {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .combat-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .combat-stat {
@@ -461,84 +509,14 @@ export default {
   background-color: #226325;
 }
 
-/* Media queries pour rendre le composant responsive */
-@media (max-width: 767px) {
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colonnes sur mobile */
-  }
-  
-  .combat-stats {
-    grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur mobile */
-  }
-}
-
-@media (max-width: 480px) {
-  .summary-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .character-portrait {
-    margin-right: 0;
-    margin-bottom: 1rem;
-    width: 120px; /* Légèrement plus grand sur petit écran */
-    height: 120px;
-  }
-  
-  .character-identity h3 {
-    font-size: 1.3rem;
-  }
-  
-  .character-subtitle, .character-background {
-    font-size: 0.9rem;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur petit mobile */
+@media (max-width: 375px) {
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
   }
   
   .form-actions {
-    flex-direction: column-reverse;
-    gap: 0.5rem;
-  }
-  
-  .btn {
-    width: 100%;
+    flex-direction: column;
   }
 }
-
-/* Spécifiquement pour iPhone SE et écrans très petits */
-@media (max-width: 375px) {
-  .summary-content {
-    padding: 1rem;
-  }
-  
-  .character-portrait {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .character-subtitle span, .character-background span {
-    display: inline-block;
-    margin-bottom: 0.2rem;
-  }
-  
-  .stat-name {
-    font-size: 0.8rem;
-  }
-  
-  .stat-value {
-    font-size: 1.3rem;
-  }
-  
-  .combat-stat span:first-child {
-    font-size: 0.8rem;
-  }
-  
-  .combat-stat span:last-child {
-    font-size: 1.1rem;
-  }
-}
-
 </style>
