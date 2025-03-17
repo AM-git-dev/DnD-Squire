@@ -2,14 +2,33 @@
   <div class="character-creation">
     <h1>Création de personnage</h1>
     
-    <div class="progress-tracker">
-      <div 
-        v-for="(step, index) in steps" 
-        :key="index" 
-        :class="['step', { 'active': currentStep === index, 'completed': currentStep > index }]"
-        @click="goToStep(index)"
-      >
-        {{ step.label }}
+    <div class="progress-tracker-container">
+      <div class="progress-tracker">
+        <div 
+          v-for="(step, index) in steps" 
+          :key="index" 
+          :class="['step', { 
+            'active': currentStep === index, 
+            'completed': currentStep > index,
+            'disabled': !canAccessStep(index)
+          }]"
+          @click="goToStep(index)"
+        >
+          {{ step.label }}
+          <div class="progress-indicator">
+            <div 
+              class="progress-fill" 
+              :style="getProgressStyle(index)"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <!-- Barre de progression globale -->
+      <div class="global-progress">
+        <div 
+          class="global-progress-fill" 
+          :style="{ width: `${(currentStep / (steps.length - 1)) * 100}%` }"
+        ></div>
       </div>
     </div>
 
@@ -90,6 +109,7 @@ export default {
   data() {
     return {
       currentStep: 0,
+      completedSteps: [true, false, false, false, false], 
       steps: [
         { label: 'Informations' },
         { label: 'Race' },
@@ -133,19 +153,33 @@ export default {
     updateCharacter(updatedCharacter) {
       this.character = { ...this.character, ...updatedCharacter };
     },
+    canAccessStep(step) {
+      return step <= this.currentStep || this.completedSteps[step];
+    },
     goToStep(step) {
-      if (step <= this.currentStep + 1 && step >= 0 && step < this.steps.length) {
+      if (this.canAccessStep(step)) {
         this.currentStep = step;
       }
     },
     nextStep() {
       if (this.currentStep < this.steps.length - 1) {
+        this.completedSteps[this.currentStep] = true;
+        this.completedSteps[this.currentStep + 1] = true;
         this.currentStep++;
       }
     },
     previousStep() {
       if (this.currentStep > 0) {
         this.currentStep--;
+      }
+    },
+    getProgressStyle(index) {
+      if (this.currentStep > index) {
+        return { width: '100%' };
+      } else if (this.currentStep === index) {
+        return { width: '100%' };
+      } else {
+        return { width: '0%' };
       }
     },
     async fetchRaces() {
@@ -189,93 +223,150 @@ export default {
   padding: 2rem;
 }
 
+.progress-tracker-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; 
+  background-color: #f5f5f5;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom: 2px solid #e0e0e0;
+  scrollbar-width: thin; 
+  scrollbar-color: rgba(36, 223, 42, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.progress-tracker-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.progress-tracker-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.progress-tracker-container::-webkit-scrollbar-thumb {
+  background-color: rgba(36, 223, 42, 0.3);
+  border-radius: 6px;
+}
+
 .progress-tracker {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2rem;
-  border-bottom: 2px solid #e0e0e0;
-  flex-wrap: wrap; 
-  overflow-x: auto; 
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 8px;
-  background-color: #7777779a;
-  border-top-left-radius: 15px;
-  border-top-right-radius:15px;
+  flex-wrap: nowrap;
+  padding: 0.8rem 0.5rem 0.3rem;
+  min-width: max-content; 
+  position: relative;
 }
 
 .step {
-  padding: 0.5rem 1rem;
   cursor: pointer;
   position: relative;
-  flex: 0 0 auto; 
   text-align: center;
-  white-space: nowrap; 
-  font-size: 0.9rem; 
-  color: white;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: black;
   font-weight: bold;
+  margin: 0 1rem 1rem;
+  min-width: 90px;
+  transition: color 0.3s ease;
 }
 
 .step.active {
   font-weight: bold;
-  color: #00ff08;
+  color: #24df2a;
 }
 
 .step.completed {
-  color: #dddada;
+  color: #666; 
 }
 
-.step.active::after {
-  content: '';
+.step.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.progress-indicator {
   position: absolute;
-  bottom: -2px;
+  bottom: -8px;
   left: 0;
   width: 100%;
-  height: 2px;
-  background-color: #00ff08;
+  height: 3px;
+  background-color: #ddd; 
+  border-radius: 3px;
+  overflow: hidden;
 }
 
+.step.active .progress-indicator {
+  background-color: #24df2a; 
+}
+
+.step.completed .progress-indicator {
+  background-color: #666;
+}
+
+.step.disabled .progress-indicator {
+  background-color: #ccc; 
+}
+
+.progress-fill {
+  display: none; 
+}
+
+.global-progress {
+  height: 4px;
+  background-color: #ddd;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+.global-progress-fill {
+  position: absolute;
+  height: 100%;
+  width: 0%;
+  background-color: #24df2a;
+  transition: width 0.5s ease;
+  border-radius: 0 2px 2px 0;
+}
 
 .step-container {
   min-height: 400px;
   width: 100%;
-  overflow-x: hidden; 
+  overflow-x: hidden;
 }
 
 .character-creation {
   max-width: 100%;
   margin: 0 auto;
   padding: 1rem;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .creation-container {
-  background-color: #f5f5f57e;
-  border-radius: 8px;
+  background-color: #f5f5f5;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow-x: hidden; 
+  overflow-x: hidden;
 }
-
-
-
 @media (max-width: 767px) {
   .character-creation {
     padding: 0.5rem;
   }
-  
   .creation-container {
     padding: 0.5rem;
   }
-}
-
-@media (max-width: 767px) {
+  
   .progress-tracker {
-    padding-bottom: 5px; 
+    padding: 0.5rem 0.3rem 0.3rem;
   }
   
   .step {
-    padding: 0.4rem 0.6rem; 
-    font-size: 0.8rem; 
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    margin: 0 0.3rem 1rem;
+    min-width: 70px;
   }
 }
 </style>
