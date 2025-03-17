@@ -10,7 +10,7 @@
 
 </script>
 
-<style>
+<style scoped>
 footer {
   position: fixed;
   bottom: 0;
@@ -20,5 +20,6 @@ footer {
   color: white;
   text-align: center;
   padding: 10px;
+  z-index: 9999;
 }
 </style>
