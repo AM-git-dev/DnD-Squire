@@ -16,73 +16,99 @@
         <div class="class-info">
           <h3>{{ characterClass.name }}</h3>
           <p>{{ characterClass.shortDescription }}</p>
+          <div class="details-btn-container">
+            <Button variant="select" @click="handleDetailsClick($event, characterClass)">Voir les détails</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="showModal" class="class-modal-overlay" @click="closeModal">
+      <div class="class-modal-content" @click.stop>
+        <button class="modal-close-btn" @click="closeModal">&times;</button>
+
+        <div v-if="modalClass" class="class-details">
+          <h3>{{ modalClass.name }}</h3>
+          <div class="class-description">
+            <p>{{ modalClass.description }}</p>
+          </div>
+          
+          <h4>Caractéristiques principales</h4>
+          <p>{{ modalClass.primaryAbility.map(ability => statName(ability)).join(', ') }}</p>
+          
+          <h4>Points de vie</h4>
+          <p><strong>Dé de vie :</strong> {{ modalClass.hitDie }}</p>
+          <p><strong>PV au niveau 1 :</strong> {{ modalClass.hitDie }} + votre modificateur de Constitution</p>
+          
+          <h4>Compétences & maîtrises</h4>
+          <p><strong>Armures :</strong> {{ modalClass.proficiencies.armor.join(', ') }}</p>
+          <p><strong>Armes :</strong> {{ modalClass.proficiencies.weapons.join(', ') }}</p>
+          <p><strong>Outils :</strong> {{ modalClass.proficiencies.tools.join(', ') || 'Aucun' }}</p>
+          <p><strong>Jets de sauvegarde :</strong> {{ modalClass.proficiencies.savingThrows.map(save => statName(save)).join(', ') }}</p>
+          
+          <h4>Équipement de départ</h4>
+          <ul>
+            <li v-for="(item, index) in modalClass.startingEquipment" :key="index">{{ item }}</li>
+          </ul>
+          
+          <h4>Répartition des caractéristiques suggérée</h4>
+          <div class="stat-distribution">
+            <div 
+              v-for="(value, stat) in modalClass.suggestedStats" 
+              :key="stat" 
+              class="stat-item"
+            >
+              <div class="stat-name">{{ statName(stat) }}</div>
+              <div class="stat-value">{{ value }}</div>
+            </div>
+          </div>
+          
+          <div class="form-check mt-4">
+            <input 
+              id="use-suggested-stats" 
+              v-model="useSuggestedStats" 
+              type="checkbox" 
+              class="form-check-input"
+            >
+            <label for="use-suggested-stats" class="form-check-label">
+              Utiliser cette répartition des caractéristiques
+            </label>
+          </div>
+
+          <div class="modal-actions">
+            <Button v-if="selectedClass && selectedClass.id === modalClass.id" 
+                   variant="create" @click="continueToNextStep">
+              Continuer avec cette classe
+            </Button>
+            <Button v-else variant="create" @click="selectClassAndContinue">
+              Sélectionner et continuer
+            </Button>
+            <Button variant="default" @click="closeModal">
+              Fermer
+            </Button>
+          </div>
         </div>
       </div>
     </div>
     
-    <div v-if="selectedClass" class="class-details">
-      <h3>{{ selectedClass.name }}</h3>
-      <div class="class-description">
-        <p class="blacktext">{{ selectedClass.description }}</p>
-      </div>
-      
-      <h4>Caractéristiques principales</h4>
-      <p class="blacktext">{{ selectedClass.primaryAbility.map(ability => statName(ability)).join(', ') }}</p>
-      
-      <h4>Points de vie</h4>
-      <p class="blacktext"><strong>Dé de vie :</strong> {{ selectedClass.hitDie }}</p>
-      <p class="blacktext"><strong>PV au niveau 1 :</strong> {{ selectedClass.hitDie }} + votre modificateur de Constitution</p>
-      
-      <h4>Compétences & maîtrises</h4>
-      <p class="blacktext"><strong>Armures :</strong> {{ selectedClass.proficiencies.armor.join(', ') }}</p>
-      <p class="blacktext"><strong>Armes :</strong> {{ selectedClass.proficiencies.weapons.join(', ') }}</p>
-      <p class="blacktext"><strong>Outils :</strong> {{ selectedClass.proficiencies.tools.join(', ') || 'Aucun' }}</p>
-      <p class="blacktext"><strong>Jets de sauvegarde :</strong> {{ selectedClass.proficiencies.savingThrows.map(save => statName(save)).join(', ') }}</p>
-      
-      <h4>Équipement de départ</h4>
-      <ul>
-        <li v-for="(item, index) in selectedClass.startingEquipment" :key="index">{{ item }}</li>
-      </ul>
-      
-      <h4>Répartition des caractéristiques suggérée</h4>
-      <div class="stat-distribution">
-        <div 
-          v-for="(value, stat) in selectedClass.suggestedStats" 
-          :key="stat" 
-          class="stat-item"
-        >
-          <div class="stat-name">{{ statName(stat) }}</div>
-          <div class="stat-value">{{ value }}</div>
-        </div>
-      </div>
-      
-      <div class="form-check mt-4">
-        <input 
-          id="use-suggested-stats" 
-          v-model="useSuggestedStats" 
-          type="checkbox" 
-          class="form-check-input"
-        >
-        <label for="use-suggested-stats" class="form-check-label">
-          Utiliser cette répartition des caractéristiques
-        </label>
-      </div>
-    </div>
-    
-    <div class="form-actions">
-      <button class="btn btn-secondary" @click="previousStep">
+    <!-- Boutons de navigation (visibles seulement quand on n'est pas dans la modal) -->
+    <div class="form-actions" v-if="!showModal">
+      <Button variant="default" @click="previousStep">
         Retour
-      </button>
-      <button class="btn btn-primary" @click="nextStep" :disabled="!selectedClass">
+      </Button>
+      <Button variant="create" @click="nextStep" :disabled="!selectedClass">
         Continuer
-      </button>
+      </Button>
     </div>
   </div>
 </template>
 
 <script>
+import Button from '@/components/Button.vue';
 export default {
   name: 'ClassSelection',
+  components: {
+    Button
+  },
   props: {
     character: {
       type: Object,
@@ -97,7 +123,9 @@ export default {
     return {
       selectedClass: this.character.class || null,
       useSuggestedStats: false,
-      localCharacter: { ...this.character }
+      localCharacter: { ...this.character },
+      showModal: false,
+      modalClass: null
     };
   },
   watch: {
@@ -119,6 +147,22 @@ export default {
     }
   },
   methods: {
+    handleDetailsClick(event, characterClass) {
+      if (event) {
+        event.stopPropagation();
+      }
+      this.openClassDetails(characterClass);
+    },
+    openClassDetails(characterClass) {
+      this.modalClass = characterClass;
+      this.showModal = true;
+      document.body.style.overflow = 'hidden';
+    },
+    closeModal() {
+      this.showModal = false;
+      // Réactiver le scroll du body
+      document.body.style.overflow = '';
+    },
     selectClass(characterClass) {
       this.selectedClass = characterClass;
       this.localCharacter.class = characterClass;
@@ -128,6 +172,17 @@ export default {
         this.localCharacter.maxHp = hitDieValue + conModifier;
         this.localCharacter.hp = this.localCharacter.maxHp;
       }
+    },
+    selectClassAndContinue() {
+      if (this.modalClass) {
+        this.selectClass(this.modalClass);
+        this.closeModal();
+        this.nextStep();
+      }
+    },
+    continueToNextStep() {
+      this.closeModal();
+      this.nextStep();
     },
     statName(stat) {
       const statNames = {
@@ -150,16 +205,10 @@ export default {
       }
     }
   }
-  
 };
 </script>
 
 <style scoped>
-
-.blacktext {
-    color:black
-  }
-  
 .class-selection {
   width: 100%;
 }
@@ -185,8 +234,8 @@ export default {
 }
 
 .class-card.selected {
-  border-color: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.5);
+  border-color: green;
+  box-shadow: 0 0 0 2px rgba(0, 128, 0, 0.5);
 }
 
 .class-image {
@@ -203,6 +252,9 @@ export default {
 
 .class-info {
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 140px);
 }
 
 .class-info h3 {
@@ -210,11 +262,73 @@ export default {
   margin-bottom: 0.5rem;
 }
 
-.class-details {
-  background-color: #f9f9f9;
-  padding: 1.5rem;
+.class-info p {
+  flex-grow: 1;
+  margin-bottom: 0.5rem;
+}
+
+.details-btn-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.class-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.class-modal-content {
+  background-color: white;
   border-radius: 8px;
-  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.class-details {
+  background-color: white;
+  border-radius: 8px;
+}
+
+.class-details h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: green;
+  font-size: 1.5rem;
 }
 
 .class-details h4 {
@@ -264,41 +378,6 @@ export default {
   margin-top: 2rem;
 }
 
-.btn {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-}
-
-.btn-primary {
-  background-color: #4caf50;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #45a049;
-}
-
-.btn-secondary {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.btn-secondary:hover {
-  background-color: #e0e0e0;
-}
-
-.btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-
- 
-}
-
-/* Ajout de media queries pour le responsive */
 @media (max-width: 767px) {
   .class-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -308,18 +387,16 @@ export default {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .class-details {
+  .class-modal-content {
+    max-width: none;
+    width: 90%;
     padding: 1rem;
-  }
-  
-  .class-details h4 {
-    font-size: 1.1rem;
   }
 }
 
 @media (max-width: 480px) {
   .class-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
   
   .stat-distribution {
@@ -339,23 +416,30 @@ export default {
     font-size: 1.1rem;
   }
   
+  .modal-actions {
+    margin-top: 1.5rem;
+  }
+  
+  .class-modal-content {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+  }
+  
+  .class-modal-overlay {
+    padding: 0;
+  }
+  
   .form-actions {
     flex-direction: column;
     gap: 0.5rem;
-  }
-  
-  .btn {
-    width: 100%;
   }
 }
 
 @media (max-width: 375px) {
   .stat-distribution {
     grid-template-columns: 1fr;
-  }
-  
-  .class-details {
-    padding: 0.8rem;
   }
   
   .class-details h3 {
