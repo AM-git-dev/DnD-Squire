@@ -1,25 +1,29 @@
 <template>
-  <header>
-    <img src="/icons/logo.png" id="logo" alt="logo de l'app" width="250" height="250">
-  </header>
-  <FooterComp />
+      <div class="herobanner">
+     <!-- <img src="public/icons/testbackground.png" alt=""> -->
+    </div>
 </template>
 
 <script setup>
 
 </script>
 
-<style>
+<style scoped>
 
 header{
   display: flex;
   width: 100%;
 }
 
-#logo{
-  
-} 
+.herobanner{
+  height: 15rem;
+  width: 100%;
+  img {
+   width: 100%;
+   height: inherit
+}
 
+}
 
 
 </style>
