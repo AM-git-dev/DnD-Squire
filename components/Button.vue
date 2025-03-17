@@ -5,17 +5,20 @@
 </template>
 
 <script setup>
+import { defineProps, defineEmits } from 'vue';
 
 defineProps({
   variant: { type: String, default: 'default' }
 });
-const emit = defineEmits(['click']);
-const onClick = () => emit('click');
 
+const emit = defineEmits(['click']);
+
+const onClick = (event) => {
+  emit('click', event);
+};
 </script>
 
 <style scoped>
-
 button {
   padding: 12px 4px;
   border: none;
@@ -23,7 +26,7 @@ button {
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  width: fit-content;
+  min-width: 100px;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
