@@ -53,7 +53,7 @@ DnD Squire est une application mobile au style pixel art conçue pour moderniser
 
 ```bash
 # Cloner le projet
-git clone https://github.com/votre-utilisateur/dnd-squire.git
+git clone https://github.com/AM-git-dev/DnD-Squire.git
 
 # Installer les dépendances
 cd dnd-squire
